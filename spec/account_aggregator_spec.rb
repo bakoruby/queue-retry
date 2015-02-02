@@ -1,4 +1,3 @@
-require 'pry'
 require 'account_aggregator'
 
 RSpec.describe AccountAggregator do
