@@ -42,5 +42,17 @@ describe BrokerageAccount do
       expect(client).to be_valid
       expect(client.balance).to eq(238723.22)
     end
+
+    it 'should be invalid if it cannot be successful in the amount of retries' do
+      stub_request(:get, "brokerage.example.com").
+        to_raise("Splat").
+        to_raise("Chunk").
+        to_return(:body => "{\"balance\":238723.22}")
+      client = BrokerageAccount.new(1234, 2)
+
+      client.call
+
+      expect(client).not_to be_valid
+    end
   end
 end
