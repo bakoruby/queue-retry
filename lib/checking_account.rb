@@ -2,14 +2,24 @@ require 'net/http'
 require 'json'
 
 class CheckingAccount
-  attr_reader :balance
+  attr_reader :balance, :error
 
-  def initialize(account_number)
+  def initialize(account_number, retries=3)
     @account_number = account_number
+    @balance = 0
+    @valid = false
+    @retries = retries
   end
 
   def call
     fetch_results
+    @valid = true
+  rescue => e
+    @error = e
+  end
+
+  def valid?
+    @valid
   end
 
   private
@@ -17,6 +27,11 @@ class CheckingAccount
   def fetch_results
     result = JSON.parse(request)
     @balance = result["balance"]
+  rescue => e
+    @retries -= 1
+    puts e.message
+    raise if @retries == 0
+    retry
   end
 
   def request

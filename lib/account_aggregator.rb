@@ -17,11 +17,17 @@ class AccountAggregator
     process_queue
   end
 
+  def valid?
+    account_balance_sources.inject(true) do |result, source|
+      result && source.valid?
+    end
+  end
+
   private
 
   def register_queue
     account_balance_sources.each do |source|
-      @queue.enq(source.new(@account_number))
+      @queue.enq(source)
     end
   end
 
@@ -31,7 +37,7 @@ class AccountAggregator
         begin
           while source = @queue.deq(true)
             source.call
-            @balance += source.balance
+            @balance += source.balance.round(2)
           end
         rescue ThreadError
         end
@@ -41,7 +47,9 @@ class AccountAggregator
   end
 
   def account_balance_sources
-    [BrokerageAccount, SavingsAccount, CheckingAccount]
+    @sources ||= [BrokerageAccount.new(@account_number),
+      SavingsAccount.new(@account_number),
+      CheckingAccount.new(@account_number)]
   end
 
 end
