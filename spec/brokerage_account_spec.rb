@@ -30,12 +30,12 @@ describe BrokerageAccount do
       expect(client.error.message).to eq('Splat')
     end
 
-    it 'should retry 3 times' do
+    it 'should retry 2 times' do
       stub_request(:get, "brokerage.example.com").
         to_raise("Splat").
         to_raise("Chunk").
         to_return(:body => "{\"balance\":238723.22}")
-      client = BrokerageAccount.new(1234, 3)
+      client = BrokerageAccount.new(1234, 2)
 
       client.call
 
@@ -48,7 +48,7 @@ describe BrokerageAccount do
         to_raise("Splat").
         to_raise("Chunk").
         to_return(:body => "{\"balance\":238723.22}")
-      client = BrokerageAccount.new(1234, 2)
+      client = BrokerageAccount.new(1234, 1)
 
       client.call
 

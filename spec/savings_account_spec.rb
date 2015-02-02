@@ -29,12 +29,12 @@ describe SavingsAccount do
       expect(client.error.message).to eq('Splat')
     end
 
-    it 'should retry 3 times' do
+    it 'should retry 2 times' do
       stub_request(:get, "savings.example.com").
         to_raise("Splat").
         to_raise("Chunk").
         to_return(:body => "{\"balance\":65182.23}")
-      client = SavingsAccount.new(1234, 3)
+      client = SavingsAccount.new(1234, 2)
 
       client.call
 
@@ -47,7 +47,7 @@ describe SavingsAccount do
         to_raise("Splat").
         to_raise("Chunk").
         to_return(:body => "{\"balance\":238723.22}")
-      client = SavingsAccount.new(1234, 2)
+      client = SavingsAccount.new(1234, 1)
 
       client.call
 
