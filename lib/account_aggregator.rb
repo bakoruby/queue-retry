@@ -1,4 +1,5 @@
 require 'thread'
+require 'bigdecimal/util'
 require_relative 'brokerage_account'
 require_relative 'savings_account'
 require_relative 'checking_account'
@@ -37,7 +38,7 @@ class AccountAggregator
         begin
           while source = @queue.deq(true)
             source.call
-            @balance += source.balance.round(2)
+            @balance += source.balance.to_d
           end
         rescue ThreadError
         end

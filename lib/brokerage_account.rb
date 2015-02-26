@@ -1,7 +1,9 @@
 require 'net/http'
 require 'json'
+require 'retryable'
 
 class BrokerageAccount
+  include Retryable
   attr_reader :balance, :error
 
   def initialize(account_number, retries=2)
@@ -25,13 +27,10 @@ class BrokerageAccount
   private
 
   def fetch_results
-    result = JSON.parse(request)
-    @balance = result["balance"]
-  rescue => e
-    @retries -= 1
-    puts e.message
-    raise if @retries < 0
-    retry
+    perform_retry @retries do
+      result = JSON.parse(request)
+      @balance = result["balance"]
+    end
   end
 
   def request
